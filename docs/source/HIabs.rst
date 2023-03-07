@@ -797,11 +797,6 @@ Here, uvtaper parameter is found by plotting 'uvwave' vs amp in plotms for the v
 
 Self-cal cycles: We start by cleaning the image (deconvolving) only selecting the channels which do not contain the line. This is done in the ``tclean`` by selecting spw range suitably. 
 
-.. figure:: /images/specline/uvtaper.png
-   :alt: Screenshot of the plotms Amp Vs uvwave for uvtaper
-   :align: center
-   :scale: 80%
-
 The cleaning is done interactively by first masking the sources visible in the dialogue view, and running the process again using the green arrow button (continue deconvolving with current clean regions) which continues the deconvolution with current clean channels in viewer GUI. We keep adding masks to any new source visible in each step and keep deconvolving until the target source noise level is reached, i.e. until the entire image looks like noise. The deconvolution is stopped at this point by clicking the red cross button. Then a round of phase only cal is performed while selecting the same spw range and applying it to all channels. With the same parameters to task ``tclean``, folowing paramters are updated and subsequestly the phase only cal is done:
 
 
