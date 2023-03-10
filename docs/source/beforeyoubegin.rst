@@ -29,7 +29,7 @@ data is same for both the PA and the IA observing modes. After a simple format
 conversion using `SIGPROC`_/`RFIClean`_, the native beam data from GMRT can be
 used with the publicly available softwares such as `SIGPROC`_, `PRESTO`_, `DSPSR`_,
 etc. The tutorial will use data already converted to the SIGPROC filterbank format.
-The primary softwares needed for the tutorial are **PRESTO**, `tempo2`_, and their
+The primary softwares needed for the tutorial are `PRESTO`_, `tempo2`_, and their
 dependencies.
 
 
