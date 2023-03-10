@@ -23,8 +23,8 @@ in their names are the data recorded using the GMRT Wideband Backend (GWB) which
 new wideband system (Upgraded GMRT).
 
 
-Pulsar/Beam data (Phased-array/Incoherent-array)
-------------------------------------------------
+Pulsar/Beam data
+-----------------
 
 These are data typically recorded after adding the signals from multiple dishes or
 the full array, either incoherently (i.e., the incoherent array mode, IA) or
