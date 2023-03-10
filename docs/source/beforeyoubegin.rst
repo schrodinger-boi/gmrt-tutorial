@@ -1,12 +1,15 @@
 Prerequisites
 ==============
 
-GMRT data (continuum/spectral line) can be analysed using NRAO's 
+Interferometric data
+---------------------
+
+The interferometric (continuum/spectral line) data from GMRT can be analysed using NRAO's 
 Common Astronomy Software Applications (CASA) or Astronomical Image Processing System (AIPS).
 We will focus on the analysis using CASA in these tutorials.
 
 CASA
------
+~~~~~
 
 You need to install the latest version of CASA. You can find the instructions to do so 
 over **here**.
@@ -17,3 +20,20 @@ starting the tutorials.
 The specific CASA version in which the tutorial was prepared is provided at the beginning 
 of the individual tutorials.
 
+Pulsar/Beam data (Phased-array/Incoherent-array modes)
+------------------------------------------------
+
+After a simple format conversion using `SIGPROC`_/`RFIClean`_, the native beam
+(pulsar/transient observing mode) data from GMRT can be used with publicly available
+softwares such as `SIGPROC`_, `PRESTO`_, `DSPSR`_, etc. The tutorial will use data
+already converted to the SIGPROC filterbank format. The primary softwares needed for
+the tutorial are **PRESTO**, `tempo2`_, and their dependencies.
+
+
+
+
+_SIGPROC: https://github.com/SixByNine/sigproc.git
+_PRESTO: https://github.com/scottransom/presto
+_DSPSR: https://github.com/demorest/dspsr
+_RFIClean: https://github.com/ymaan4/RFIClean
+_TEMPO2: https://bitbucket.org/psrsoft/tempo2.git
