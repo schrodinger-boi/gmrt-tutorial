@@ -23,17 +23,20 @@ of the individual tutorials.
 Pulsar/Beam data (Phased-array/Incoherent-array modes)
 ------------------------------------------------
 
-After a simple format conversion using `SIGPROC`_/`RFIClean`_, the native beam
-(pulsar/transient observing mode) data from GMRT can be used with publicly available
-softwares such as `SIGPROC`_, `PRESTO`_, `DSPSR`_, etc. The tutorial will use data
-already converted to the SIGPROC filterbank format. The primary softwares needed for
-the tutorial are **PRESTO**, `tempo2`_, and their dependencies.
+The pulsar/beam data are typically recorded using the phased-array (PA) and the
+incoherent-array (IA) observing modes of the GMRT. The format of the native beam
+data is same for both the PA and the IA observing modes. After a simple format
+conversion using `SIGPROC`_/`RFIClean`_, the native beam data from GMRT can be
+used with the publicly available softwares such as `SIGPROC`_, `PRESTO`_, `DSPSR`_,
+etc. The tutorial will use data already converted to the SIGPROC filterbank format.
+The primary softwares needed for the tutorial are **PRESTO**, `tempo2`_, and their
+dependencies.
 
 
 
 
-_SIGPROC: https://github.com/SixByNine/sigproc.git
-_PRESTO: https://github.com/scottransom/presto
-_DSPSR: https://github.com/demorest/dspsr
-_RFIClean: https://github.com/ymaan4/RFIClean
-_TEMPO2: https://bitbucket.org/psrsoft/tempo2.git
+.. _SIGPROC: https://github.com/SixByNine/sigproc.git
+.. _PRESTO: https://github.com/scottransom/presto
+.. _DSPSR: https://github.com/demorest/dspsr
+.. _RFIClean: https://github.com/ymaan4/RFIClean
+.. _TEMPO2: https://bitbucket.org/psrsoft/tempo2.git
