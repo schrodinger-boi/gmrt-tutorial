@@ -20,8 +20,8 @@ starting the tutorials.
 The specific CASA version in which the tutorial was prepared is provided at the beginning 
 of the individual tutorials.
 
-Pulsar/Beam data (Phased-array/Incoherent-array modes)
-------------------------------------------------
+Pulsar/Beam data
+-----------------
 
 The pulsar/beam data are typically recorded using the phased-array (PA) and the
 incoherent-array (IA) observing modes of the GMRT. The format of the native beam
