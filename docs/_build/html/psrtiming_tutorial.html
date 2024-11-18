@@ -1,0 +1,207 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Timing of Pulsars &mdash; GMRT tutorials 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GMRT tutorials
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="beforeyoubegin.html">Prerequisites</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introtogmrtdata.html">Introduction to the GMRT data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="continuumband4.html">Continuum data reduction using CASA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HIabsv0.html">Spectral line  data reduction using CASA (source 1543+480)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pulsar.html">Pulsar data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capturep.html">CAPTURE Pipeline</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GMRT tutorials</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Timing of Pulsars</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/psrtiming_tutorial.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="timing-of-pulsars">
+<span id="continuumb4"></span><h1>Timing of Pulsars<a class="headerlink" href="#timing-of-pulsars" title="Link to this heading"></a></h1>
+<p>The tutorial is intended to provide you an introduction to the basic steps related to the timing analysis of pulsar using GMRT beam data. We will be using the band-3 (300 - 500 MHz) datasets for this purpose. We will only consider the case of an isolated pulsar for the exercise.</p>
+<p>We will use PSRCHIVE and TEMPO2 Softwares.</p>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<p>The GMRT beam data is in binary format and is converted to “filterbank” format (same binary file with a header). The “filterbank” is folded based on pulsar ephemeris, yielding three-dimensional (time, frequency, phase) folded pulsar data (“pfd”). For this tutorial, we will begin with “pfd” files.</p>
+<p>You need to have PSRCHIVE and TEMPO2 installed on your machine. You also need the “pfd” files to be
+available on your disk.</p>
+</section>
+<section id="prediction-of-phases-of-pulsar-using-tempo2">
+<h2>Prediction of phases of pulsar using TEMPO2<a class="headerlink" href="#prediction-of-phases-of-pulsar-using-tempo2" title="Link to this heading"></a></h2>
+<p>Right Ascension (RA) and Declination (DEC) provide the source’s two-dimensional position in the sky, which is typically defined by the J2000 system. The pulsar’s spin frequency (F0) is defined as the reciprocal of its spining period. F1 is the first derivative of spin frequency with respect to time. Since the pulsar slows down over time, F1 has a negative value. The dispersion measure (DM) quantifies the line of sight column density of electrons. All of these parameters are listed in a file called the pulsar’s parameter file. Let’s start with a parameter file of pulsar J1646-2142, which contains the pulsar’s name, RA, DEC, F0, F1, and DM values.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="n">J1646</span><span class="o">-</span><span class="mf">2142.</span><span class="n">par</span>
+</pre></div>
+</div>
+<figure class="align-default">
+<img alt="_images/RAS_IM1.png" src="_images/RAS_IM1.png" />
+</figure>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tempo2</span> <span class="o">-</span><span class="n">gr</span> <span class="n">fake</span> <span class="o">-</span><span class="n">f</span> <span class="n">J1646</span><span class="o">-</span><span class="mf">2142.</span><span class="n">par</span> <span class="o">-</span><span class="n">nobsd</span> <span class="mi">1</span> <span class="o">-</span><span class="n">ndobs</span> <span class="mi">7</span> <span class="o">-</span><span class="n">randha</span> <span class="n">y</span> <span class="o">-</span><span class="n">ha</span> <span class="mi">8</span> <span class="o">-</span><span class="n">start</span> <span class="mi">59000</span> <span class="o">-</span><span class="n">end</span> <span class="mi">60000</span> <span class="o">-</span><span class="n">rms</span> <span class="mf">1e-3</span>
+</pre></div>
+</div>
+<p>This will generate time of arrivals (ToAs) for this pulsar ranging from MJD 59000 to 60000. ToAs are measured for weekly observations (i.e. one observation per seven days). A single ToA is generated for each observation. Each ToA will have a 1e-3 millisecond error (i.e. 1 microsecond). The observation hour angle is chosen at random over an 8-hour period.</p>
+<p>At the end of this a file with name J1646-2142.simulate is created. The file J1646-2142.simulate contains the predicted ToAs of the pulsar.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">head</span> <span class="n">J1646</span><span class="o">-</span><span class="mf">2142.</span><span class="n">simulate</span>
+</pre></div>
+</div>
+<figure class="align-default">
+<img alt="_images/RAS_IM2.png" src="_images/RAS_IM2.png" />
+</figure>
+<p>Normally, the first column represents the file name; in this case, it is the same here because it was predicted using tempo2’s fake plugin. The frequency is represented in megahertz in the second column. The third and fourth columns contain the ToAs for the observation and the associated error. Note that we maintained the same error during prediction for all observations. The the last column contains the observatory site code.</p>
+</section>
+<section id="the-impact-of-parameter-errors-on-timing-data">
+<h2>The impact of parameter errors on timing data<a class="headerlink" href="#the-impact-of-parameter-errors-on-timing-data" title="Link to this heading"></a></h2>
+<p>First check the phases of the pulsar are derived accurately by running the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tempo2</span> <span class="o">-</span><span class="n">nofit</span> <span class="o">-</span><span class="n">f</span> <span class="n">J1646</span><span class="o">-</span><span class="mf">2142.</span><span class="n">par</span>  <span class="n">J1646</span><span class="o">-</span><span class="mf">2142.</span><span class="n">simulate</span> <span class="o">-</span><span class="n">gr</span> <span class="n">plk</span>
+</pre></div>
+</div>
+<p>The command above displays the difference between the ToAs predicted by the parameter file J1646-2142.par and the ToAs listed in the timing file J1646-2142.simulate. The residuals must be randomly distributed around the zero line if the ToAs listed in the J1646-2142.simulate file matched the prediction from the J1646-2142.par file. The figure below demonstrates this.</p>
+<figure class="align-default">
+<img alt="_images/RAS_IM3.png" src="_images/RAS_IM3.png" />
+</figure>
+<p>Now let’s introduce a small error (say around an arc-sec) in postion (RA and DEC) in the parameter file to see the effect of wrong position on the timing data. After putting the offset in the parameter file run the above command again which will show that an error in position has yearly periodic variation in the residuals. This is demonstrated in figure below.</p>
+<figure class="align-default">
+<img alt="_images/RAS_IM4.png" src="_images/RAS_IM4.png" />
+</figure>
+<p>If you fit for the RA/DEC for which the error is introduced, you will again get the randomly sampled residuals around the zero line in the post-fit residuals.</p>
+<p>Now, reset the parameter file to its default values and try introducing a small error in F0. The residuals for the F0 error show a straight line pattern with no periodicity, as shown below.</p>
+<figure class="align-default">
+<img alt="_images/RAS_IM5.png" src="_images/RAS_IM5.png" />
+</figure>
+<p>Again, if you fit for the F0, you will get the randomly sampled residuals around the zero line in the post-fit residuals.</p>
+<p>Try the same thing again with error in F1, and this time you’ll notice a parabolic long-term variation like the one in the image below.</p>
+<figure class="align-default">
+<img alt="_images/RAS_IM6.png" src="_images/RAS_IM6.png" />
+</figure>
+<p>Understanding the pattern in the residuals caused by parameter error will assist us in solving a newly discovered pulsar. Once accurate (phase-coherent) solutions for a pulsar are obtained, one can establish its clock-like behaviour and predict its phases at any point in time.</p>
+</section>
+<section id="time-to-solve-a-newly-discovered-pulsar">
+<h2>Time to solve a Newly Discovered Pulsar<a class="headerlink" href="#time-to-solve-a-newly-discovered-pulsar" title="Link to this heading"></a></h2>
+<p>This time we will start with the real GMRT data set for a newly discovered pulsar J1244-4708 which is discovered in the GMRT High Resolution Southern Sky Survey.</p>
+<p>This pulsar was localised through imaging of a single observational epoch which provides us with its RA and DEC which are accurate to a few arc-seconds. The F0 and DM values of the pulsar were estimated using data from an epoch observation in which the pulsar was strongly detected. We used the reciprocal of the period value (in seconds) given in the waterfall plot of that observation to calculate F0. Similarly, from the same plot, we noted the DM and epoch of the observation. Using these values, we created a parameter file for this pulsar (in this case, J1244-4708.par) that contains an initial guess of its parameters.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="n">J1244</span><span class="o">-</span><span class="mf">4708.</span><span class="n">par</span>
+</pre></div>
+</div>
+<figure class="align-default">
+<img alt="_images/RAS_IM10.png" src="_images/RAS_IM10.png" />
+</figure>
+<p>In this exercise, we will use GMRT’s incoherent array (IA) beam data. This pulsar has been observed 13 times over a baseline of 9 months. The GMRT IA beam data is first converted to “filterbank” format, then dedispersed and folded to “pfd” format. We’ll start with the “pfd” files right away.</p>
+</section>
+<section id="time-of-arrival-estimation">
+<h2>Time of arrival estimation<a class="headerlink" href="#time-of-arrival-estimation" title="Link to this heading"></a></h2>
+<p>The “pfd.ps” files contain waterfall plots for all “pfd” files. The first step is to go through all of the profiles and find the cleanest one with the sufficiently bright integrated pulse. We will use that profile as our reference or template profile, assuming it is the true profile of the pulsar. Use the following command to view all the profiles.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">evince</span> <span class="o">*</span><span class="n">ps</span>
+</pre></div>
+</div>
+<p>After selecting the template profile, the next step is to estimate how many ToAs should be extracted from each observation. We will derive a single ToA for full observation for weak detections, two ToAs for mildly detectect profiles, and four ToAs for bright detections. This approach will be adequate to find the solution in this specific case. To determine the number of ToAs for individual observations, check all the profiles again using the command above.</p>
+<p>Let’s say you’ve selected k ToAs for a particular observation A.pfd and B.pfd is your chosen epoch for the template. Then run the following command to get the ToAs for observation A.pfd.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">get_TOAs</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">n</span> <span class="n">k</span> <span class="o">-</span><span class="n">t</span> <span class="n">B</span><span class="o">.</span><span class="n">bestprof</span> <span class="n">A</span><span class="o">.</span><span class="n">pfd</span> <span class="o">&gt;&gt;</span> <span class="n">J1244</span><span class="o">-</span><span class="mf">4708.</span><span class="n">tim</span>
+</pre></div>
+</div>
+<p>This command will find the ToAs for observation A.pfd by cross-correlating it with template B.bestprof. The ToAs will be saved in the J1244-4708.tim timing file.</p>
+<p>The value of k varies depending on the detection strength of the pulsar for each observation. So, for each observation, use the same command, but change the file names A.pfd and the corresponding k value while keeping the template same (i.e., B.bestprof). Once all observations’ ToAs have been generated, run the command below.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tempo2</span> <span class="o">-</span><span class="n">nofit</span> <span class="o">-</span><span class="n">f</span> <span class="n">J1244</span><span class="o">-</span><span class="mf">4708.</span><span class="n">par</span> <span class="n">J1244</span><span class="o">-</span><span class="mf">4708.</span><span class="n">tim</span> <span class="o">-</span><span class="n">gr</span> <span class="n">plk</span>
+</pre></div>
+</div>
+<p>This command displays the difference (or residuals) between the observed ToAs (in the J1244-4708.tim file) and the predicted ToAs (predicted using J1244-4708.par file). Because the ToAs for a newly discovered pulsar are not phase-connected, we will not see any general systematic pattern in the residuals. This is illustrated in the figure below.</p>
+<figure class="align-default">
+<img alt="_images/RAS_IM7.png" src="_images/RAS_IM7.png" />
+</figure>
+<p>Now, take a sample of densely sampled points and start fitting from F0. Once you’ve identified a pattern in the ToAs, try fitting RA and DEC. Finally, you can try fitting F1, but keep in mind that the value of F1 for 9 months of data will be highly unreliable. Once phase coherent solutions are obtained, ToAs will exhibit near-random behaviour around the zero line, as shown in the figure below.</p>
+<figure class="align-default">
+<img alt="_images/RAS_IM8.png" src="_images/RAS_IM8.png" />
+</figure>
+<p>Examine the F0, F1, RA, and DEC values. Since RA and DEC are obtained through imaging, the post-fit RA and DEC should be within a few arc-seconds of the initial guess (i.e., pre-fit values). The F1 value after fitting should be negative and small (compared to error in F0). Below are the fitted values for this exercise.</p>
+<figure class="align-default">
+<img alt="_images/RAS_IM9.png" src="_images/RAS_IM9.png" />
+</figure>
+<p>Finally, on the graphical interface, select “new par” to create the new parameter file. Now that the pulsar’s phase-coherent solution has been found, you will be able to predict the ToAs in future observations. The prediction accuracy improves as the number of observations and the timing baseline increase.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Ruta Kale.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,234 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Searching for new pulsars &mdash; GMRT tutorials 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GMRT tutorials
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="beforeyoubegin.html">Prerequisites</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introtogmrtdata.html">Introduction to the GMRT data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="continuumband4.html">Continuum data reduction using CASA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HIabsv0.html">Spectral line  data reduction using CASA (source 1543+480)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pulsar.html">Pulsar data analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="capturep.html">CAPTURE Pipeline</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GMRT tutorials</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Searching for new pulsars</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/psrsearchb3.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="searching-for-new-pulsars">
+<span id="psrsearchb4"></span><h1>Searching for new pulsars<a class="headerlink" href="#searching-for-new-pulsars" title="Link to this heading"></a></h1>
+<p>This part of the tutorial aims to demostrate the process of pulsar search using observations from GMRT. We will use band-4 (550-750 MHz) data of a test pulsar.</p>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<p>Pulsars are fascinating extraterrestrial objects that produce pulse like emission with very precise periodicity. These objects are often detected in time domain radio observations. In this tutorial, we will learn how to search for these objects using the strengths of individual pulsed emission as well as their precise periodic behaviour. This tutorial will require PRESTO installed on your machine along with a filterbank file with pulsar in it.</p>
+</section>
+<section id="checking-filterbank-file">
+<h2>Checking filterbank file<a class="headerlink" href="#checking-filterbank-file" title="Link to this heading"></a></h2>
+<p>Filterbank file is a file-format for beam data from radio telescopes. This file has the metadata of the observation along with the raw beamdata recorded in the telescope. Use following syntax to check the metadata,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">header</span> <span class="o">&lt;</span><span class="n">filterbank_file</span><span class="o">.</span><span class="n">fil</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<figure class="align-center" id="id1">
+<img alt="_images/header_tutorial.png" src="_images/header_tutorial.png" />
+<figcaption>
+<p><span class="caption-text"><em>Example of a filterbank header</em></span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="dedispersion">
+<h2>Dedispersion<a class="headerlink" href="#dedispersion" title="Link to this heading"></a></h2>
+<p>For an unknown pulsar, we don’t know the dispersion caused by the intersteller medium. We try a lot of trial DM values and perform search in each dedispersed time series. We will use <code class="docutils literal notranslate"><span class="pre">prepsubband</span></code> to dedisperse the filterbank file at a range of trial DM values,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">prepsubband</span> <span class="o">-</span><span class="n">lodm</span> <span class="o">&lt;</span><span class="n">smallest_trial_dm</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">dmstep</span> <span class="o">&lt;</span><span class="n">seperation_between_dms</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">numdms</span> <span class="o">&lt;</span><span class="n">number_of_trial_dms</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">numout</span> <span class="o">&lt;</span><span class="n">number_of_output_samples</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">input_fil_name</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">o</span> <span class="o">&lt;</span><span class="n">output_base_name</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Please note that number of output samples should be an even number (in order to get a straight-forwand FFT in later stage). This will create a number of dedispersed time series with names output_base_name_dm.dat. These are the time series that will be used for single pulse search as well as periodicity search.</p>
+</section>
+<section id="exploring-the-time-series">
+<h2>Exploring the time series<a class="headerlink" href="#exploring-the-time-series" title="Link to this heading"></a></h2>
+<p>Now, since we have the dedispersed time series, we can try to visualize the pulses in the time series. Use <code class="docutils literal notranslate"><span class="pre">exploredat</span></code> to visualize the time series,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">exploredat</span> <span class="n">output_base_name</span><span class="o">.</span><span class="n">dat</span>
+</pre></div>
+</div>
+<p>This will generate an interactive plot,</p>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="_images/J1534+5334_exploredat.png"><img alt="Importgmrt log" src="_images/J1534%2B5334_exploredat.png" style="width: 554.4px; height: 431.9px;" /></a>
+<figcaption>
+<p><span class="caption-text"><em>Output plot of exploredat. One can zoom in, zoom out, and move around in this plot.</em></span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>You can even try to estimate the period of the repeating signal from this plot.</p>
+</section>
+<section id="single-pulse-search">
+<h2>Single pulse search<a class="headerlink" href="#single-pulse-search" title="Link to this heading"></a></h2>
+<p>Though we have seen the single pulses from the pulsar directly in the time series, there is a formal way to search for single pulses in the time series.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">single_pulse_search</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">t</span> <span class="o">&lt;</span><span class="n">significance_threshold</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">m</span> <span class="o">&lt;</span><span class="n">maximum_width</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">dedispersed_time_Series</span><span class="o">.</span><span class="n">dat</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>This generates a text file with information of individual detected pulses for each time series. Now, we need to combine the results of each search in a single summary plot,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">single_pulse_search</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">t</span> <span class="o">&lt;</span><span class="n">significance_threshold</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">_dedispersed_time_Series</span><span class="o">.</span><span class="n">singlepulse</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<figure class="align-center" id="id3">
+<a class="reference internal image-reference" href="_images/single_pulse_tutorial.png"><img alt="Listobs log" src="_images/single_pulse_tutorial.png" style="width: 690.1999999999999px; height: 689.5px;" /></a>
+<figcaption>
+<p><span class="caption-text"><em>Output of single pulse search. We get location of pulses, number of pulses, and single pulse S/Ns as a function of DM.</em></span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>You can note down timestamp of some strong pulses from the text file and try to varify it’s presence in the time series using <code class="docutils literal notranslate"><span class="pre">exploredat</span></code>. The candidate plot of a single pulse is contains various diagonstic plots,</p>
+<figure class="align-center" id="id4">
+<a class="reference internal image-reference" href="_images/single_pulse_cand.png"><img alt="Listobs log" src="_images/single_pulse_cand.png" style="width: 937.8000000000001px; height: 544.6px;" /></a>
+<figcaption>
+<p><span class="caption-text"><em>Diagnostic plot of a single pulse candidate.</em></span><a class="headerlink" href="#id4" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id5">
+<a class="reference internal image-reference" href="_images/single_pulse_noise.png"><img alt="Listobs log" src="_images/single_pulse_noise.png" style="width: 931.0px; height: 547.2px;" /></a>
+<figcaption>
+<p><span class="caption-text"><em>False single pulse candidate.</em></span><a class="headerlink" href="#id5" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="search-for-faint-pulsars-using-periodicity-search">
+<h2>Search for faint pulsars using periodicity search<a class="headerlink" href="#search-for-faint-pulsars-using-periodicity-search" title="Link to this heading"></a></h2>
+<p>There are pulsars that are weak and can not be seen in single pulses. To recover such puslars, we use their periodic property to get a good indication of their presence in the time series. Here, we will see one such method called FFT based periodicity search. The process is to take Fourier transform of the time series and search for strong signal in the power spectra.
+First we will see how FFT of a time series with repeating signal looks like. To compute the FFT of the time series,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">realfft</span> <span class="o">-</span><span class="n">fwd</span> <span class="o">&lt;</span><span class="n">dedispersed_time_series</span><span class="o">.</span><span class="n">dat</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>This will create a file with .fft extension. To see this file in a plot,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">explorefft</span> <span class="o">&lt;</span><span class="n">dedispersed_time_series</span><span class="o">.</span><span class="n">fft</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>You will see signal at fundamental and subsequent harmonics.</p>
+<figure class="align-center" id="id6">
+<a class="reference internal image-reference" href="_images/fft_tutorial.png"><img alt="Listobs log" src="_images/fft_tutorial.png" style="width: 559.3px; height: 408.09999999999997px;" /></a>
+<figcaption>
+<p><span class="caption-text"><em>Visualization of power-spectra of a time series. Strong signal can be seen at the fundamental and subsequent harmoics.</em></span><a class="headerlink" href="#id6" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<dl>
+<dt>An algorithm called harmonic summing is used to add up signal power in the harmonics to increase the detection significance. This algorithm is implemented in <code class="docutils literal notranslate"><span class="pre">accelsearch</span></code>.</dt><dd><p>We use <code class="docutils literal notranslate"><span class="pre">accelsearch</span></code> to search for periodic signal, after cleaning the FFT of timeseries using <code class="docutils literal notranslate"><span class="pre">rednoise</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rednoise</span> <span class="o">&lt;</span><span class="n">dedispersed_time_series</span><span class="o">.</span><span class="n">fft</span><span class="o">&gt;</span>
+<span class="n">aacelsearch</span> <span class="o">-</span><span class="n">zmax</span> <span class="mi">0</span> <span class="o">-</span><span class="n">numharm</span> <span class="mi">16</span> <span class="o">&lt;</span><span class="n">dedispersed_time_series_red</span><span class="o">.</span><span class="n">fft</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>This will generate a text file containing the results of the search.</p>
+<figure class="align-center" id="id7">
+<a class="reference internal image-reference" href="_images/Accelsearch_result.png"><img alt="Listobs log" src="_images/Accelsearch_result.png" style="width: 988.4px; height: 276.5px;" /></a>
+<figcaption>
+<p><span class="caption-text"><em>Result of accelsearch. First detection is the first harmonic of the pulsar signal.</em></span><a class="headerlink" href="#id7" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="folding-filterbank-file">
+<h2>Folding filterbank file<a class="headerlink" href="#folding-filterbank-file" title="Link to this heading"></a></h2>
+<p>Once we know the correct period and DM of the pulsar, we can fold the filterbank file to generate characteristic plots of the pulsar. We use <code class="docutils literal notranslate"><span class="pre">prepfold</span></code> to fold a filterbank,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">prepfold</span> <span class="o">-</span><span class="n">p</span> <span class="o">&lt;</span><span class="n">period</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">dm</span> <span class="o">&lt;</span><span class="n">DM</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">nosearch</span> <span class="o">-</span><span class="n">zerodm</span> <span class="o">&lt;</span><span class="n">filterbank_file</span><span class="o">.</span><span class="n">fil</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<figure class="align-center" id="id8">
+<a class="reference internal image-reference" href="_images/tutorial_profile.png"><img alt="Listobs log" src="_images/tutorial_profile.png" style="width: 695.0999999999999px; height: 518.6999999999999px;" /></a>
+<figcaption>
+<p><span class="caption-text"><em>Result of prepfold. Profile of the pulsar along with subintegration vs phase, frequency vs phase, S/N vs DM, S/N vs period plots.</em></span><a class="headerlink" href="#id8" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id9">
+<a class="reference internal image-reference" href="_images/J1533_noise_cand.png"><img alt="Listobs log" src="_images/J1533_noise_cand.png" style="width: 693.0px; height: 521.5px;" /></a>
+<figcaption>
+<p><span class="caption-text"><em>A false candidate. The pulse seen in the profile is caused by RFI in the time series.</em></span><a class="headerlink" href="#id9" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>There are lot of such plots for each trial DM in a blind search. All these plots are inspected either by eye or an machine learning based classifier to tell which one is a pulsar and which one is not. Once a pulsar is identified, one needs to check if it’s a new pulsar or an already known pulsar.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Ruta Kale.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
