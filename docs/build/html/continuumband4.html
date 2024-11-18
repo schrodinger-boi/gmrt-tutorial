@@ -1,0 +1,707 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Continuum data reduction using CASA &#8212; gmrt-tutorial q documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Spectral line data reduction using CASA (source 1543+480)" href="HIabsv0.html" />
+    <link rel="prev" title="Prerequisites" href="beforeyoubegin.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="continuum-data-reduction-using-casa">
+<span id="continuumb4"></span><h1>Continuum data reduction using CASA<a class="headerlink" href="#continuum-data-reduction-using-casa" title="Permalink to this heading">¶</a></h1>
+<p>The tutorial is intended to provide you an introduction to the basic steps involved in
+the analysis of continuum data from the GMRT. We will be using a band-4 (550 - 750 MHz)
+dataset.</p>
+<p>CASA version used for the tutorial: 6.5.2</p>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">¶</a></h2>
+<p>You need to have CASA installed on your machine. You also need the data to be available on your disk.</p>
+<p>From the GMRT online archive you can download data in “lta” or “FITS” format. If you downloaded the data in lta format then you will need to do the following steps to convert it to FITS format. You can download the pre-compiled binary files “listscan” and “gvfits” from the observatory.</p>
+<section id="lta-to-fits-conversion">
+<h3>LTA to FITS conversion<a class="headerlink" href="#lta-to-fits-conversion" title="Permalink to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listscan</span> <span class="n">fileinltaformat</span><span class="o">.</span><span class="n">lta</span>
+</pre></div>
+</div>
+<p>At the end of this a file with extension .log is created. The next step is to run gvfits on this file.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gvfits</span> <span class="n">fileinltaformat</span><span class="o">.</span><span class="n">log</span>
+</pre></div>
+</div>
+<p>The file TEST.FITS contains your visibilities in FITS format. Before running gvfits, you can edit the fileinltaformat.log and provide a
+name of your choice in place of TEST.FITS.</p>
+</section>
+<section id="fits-to-ms-conversion">
+<h3>FITS to MS conversion<a class="headerlink" href="#fits-to-ms-conversion" title="Permalink to this heading">¶</a></h3>
+<p>At this stage start CASA using the command <code class="docutils literal notranslate"><span class="pre">casa</span></code> on your terminal. You will be on the Ipython prompt and a logger window will appear.
+The remaining analysis will be done at the CASA Ipython prompt. We use the CASA task importgmrt to convert
+data from FITS to MS format. In our case the FITS file is already provided so we proceed with that FITS file.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">casa</span>
+<span class="n">inp</span> <span class="n">importgmrt</span>
+<span class="n">fitsfile</span><span class="o">=</span><span class="s1">&#39;SGRB-DATA.FITS&#39;</span>
+<span class="n">vis</span><span class="o">=</span><span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">go</span> <span class="n">importgmrt</span>
+</pre></div>
+</div>
+<p>The output file <em>multi.ms</em> file will contain your visibilities in MS format.</p>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="_images/importgmrtlog.png"><img alt="Importgmrt log" src="_images/importgmrtlog.png" style="width: 1113.6999999999998px; height: 429.79999999999995px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Output of the task importgmrt in the logger and view of the terminal. We will ignore the warnings in the logger for this tutorial.</em></span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>An alternative way to run the task is as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">importgmrt</span><span class="p">(</span><span class="n">fitsfile</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="n">SGRB</span><span class="o">-</span><span class="n">DATA</span><span class="o">.</span><span class="n">FITS</span><span class="s1">&#39;,vis=&#39;</span><span class="n">multi</span><span class="o">.</span><span class="n">ms</span><span class="s1">&#39;)</span>
+</pre></div>
+</div>
+<p>For the tutorial, we will follow the first method.</p>
+<p>The MS format stores the visibility data in the form of a table. The <em>data</em> column contains the data. Operations
+like calibration and deconvolution will produce additional columns such as the <em>corrected</em> and <em>model</em> data columns.</p>
+</section>
+</section>
+<section id="data-inspection">
+<h2>Data inspection<a class="headerlink" href="#data-inspection" title="Permalink to this heading">¶</a></h2>
+<p>You will first want to know about the contents of the MS file.
+The task listobs will provide a summary of the contents of your dataset in the logger window.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inp</span> <span class="n">listobs</span>
+<span class="n">vis</span><span class="o">=</span><span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">go</span> <span class="n">listobs</span>
+</pre></div>
+</div>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="_images/listobslog.png"><img alt="Listobs log" src="_images/listobslog.png" style="width: 1146.6px; height: 534.8px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Output of the task listobs in the logger.</em></span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>You can also choose to save the output to a text file so that you can refer to it when needed without having to run the task.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">inp</span> <span class="n">listobs</span>
+<span class="n">vis</span><span class="o">=</span><span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">listfile</span><span class="o">=</span><span class="s1">&#39;listobs-out.txt&#39;</span>
+<span class="n">go</span> <span class="n">listobs</span>
+</pre></div>
+</div>
+<p>Note the scans, field ids, source names, number of channels, total bandwidth, channel width and central frequency for your observations.
+Field ids (e. g. 0, 1, 2) can be used in subsequent task to choose sources instead of their names (e. g. 3C286, SGRB, etc.).</p>
+<p>The task <code class="docutils literal notranslate"><span class="pre">plotms</span></code> is used to plot the data. It opens a GUI in which you can choose to display portions of your data.
+Go through the help for plotms GUI in CASA documentation.</p>
+<p>It is important to make a good choice of parameters to plot, so that you do not end up asking to plot too much data at the same
+time - this can either lead to crashing of plotms or may take a long time to display the data.</p>
+<p>Our aim is to inspect the data for non-working antennas. A good choice would be to limit the fields to
+calibrators and choosing a single channel and plot Amp Vs Time and iterating over antennas.
+Another good plot for inspection is to choose a single antenna, choose all the channels and plot Amp Vs Channel while iterating
+over baselines.</p>
+<p>It is good to set the inputs for a task to default before running it.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">plotms</span><span class="p">)</span>
+<span class="n">plotms</span>
+</pre></div>
+</div>
+<figure class="align-center" id="id3">
+<a class="reference internal image-reference" href="_images/plotmsampvstime.png"><img alt="Plotms screenshot" src="_images/plotmsampvstime.png" style="width: 756.0px; height: 423.5px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>Screenshot of plotms. Fields 0 and 1 for the channel 400 and correlation rr are plotted for antenna C00. Iteration over anntennas in the Page tab seen on the left of the plotms window.</em></span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="flagging">
+<h2>Flagging<a class="headerlink" href="#flagging" title="Permalink to this heading">¶</a></h2>
+<p>Editing out bad data (e. g. non-working antennas, RFI affected channels, etc.) is termed as flagging. In our MS file,
+the bad data will be marked with flags and not actually removed as such - thus the term <em>flagging</em>.
+The task <code class="docutils literal notranslate"><span class="pre">flagdata</span></code> will be used to flag the data. See the detailed CASA documentation on flagging using the
+task <code class="docutils literal notranslate"><span class="pre">flagdata</span></code>.</p>
+<p>Here some typical steps of flagging are outlined to get you started.</p>
+<p>Usually the first spectral channel is saturated. Thus it is a good idea to flag the first spectral channel. The input
+‘spw = 0:0’ sets the choice of spectral window 0, channel number 0.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">flagdata</span><span class="p">)</span>
+<span class="n">inp</span> <span class="n">flagdata</span>
+<span class="n">vis</span> <span class="o">=</span> <span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;manual&#39;</span>
+<span class="n">spw</span> <span class="o">=</span> <span class="s1">&#39;0:0&#39;</span>
+<span class="n">savepars</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">cmdreason</span> <span class="o">=</span> <span class="s1">&#39;badchan&#39;</span>
+<span class="n">go</span> <span class="n">flagdata</span>
+</pre></div>
+</div>
+<p>Flagging the first and last records of all the scans is also similarly a good idea. Remember to set the task inputs to <em>default</em>
+before entering new inputs.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">flagdata</span><span class="p">)</span>
+<span class="n">inp</span> <span class="n">flagdata</span>
+<span class="n">vis</span> <span class="o">=</span> <span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;quack&#39;</span>
+<span class="n">quackmode</span> <span class="o">=</span> <span class="s1">&#39;beg&#39;</span>
+<span class="n">quackinterval</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">savepars</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">cmdreason</span> <span class="o">=</span><span class="s1">&#39;quackbeg&#39;</span>
+<span class="n">go</span> <span class="n">flagdata</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">flagdata</span><span class="p">)</span>
+<span class="n">inp</span> <span class="n">flagdata</span>
+<span class="n">vis</span> <span class="o">=</span> <span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;quack&#39;</span>
+<span class="n">quackmode</span> <span class="o">=</span> <span class="s1">&#39;endb&#39;</span>
+<span class="n">quackinterval</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">savepars</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">cmdreason</span> <span class="o">=</span><span class="s1">&#39;quackend&#39;</span>
+<span class="n">go</span> <span class="n">flagdata</span>
+</pre></div>
+</div>
+<p>In the next step we would like to flag data on antennas that were not working.
+Using <code class="docutils literal notranslate"><span class="pre">plotms</span></code>, find out which antennas were not working. Non-working antennas <em>generally</em> show up as those having very small amplitude even on bright calibrators, show no relative change of amplitude for calibrators and target sources and the phases towards calibrator sources on any given baseline will be randomly distributed between -180 to 180 degreees. If such antennas are found in the data, those can be flagged using
+the task <code class="docutils literal notranslate"><span class="pre">flagdata</span></code>.</p>
+<div class="admonition-note admonition">
+<p class="admonition-title">Note</p>
+<p>Only an example is provided here - you need to locate the bad antennas in the tutorial data and flag those.</p>
+</div>
+<p>Remember also that the some antennas may not be bad at all times. However if an antennas stops working while on the target source, it can be difficult to find out. Thus make a decision based on the secondary calibrator scans. Depending on when such antennas stopped working, you can choose to flag them for that duration. Check the two polarizations separately.</p>
+<p>Although <code class="docutils literal notranslate"><span class="pre">plotms</span></code> provides options for flagging data interactively, at this stage, we will choose to just locate the bad data and flag it using the task <code class="docutils literal notranslate"><span class="pre">flagdata</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">flagdata</span><span class="p">)</span>
+<span class="n">inp</span> <span class="n">flagdata</span>
+<span class="n">vis</span> <span class="o">=</span> <span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;manual&#39;</span>
+<span class="n">antenna</span> <span class="o">=</span> <span class="s1">&#39;E02, S02, W06&#39;</span>
+<span class="n">savepars</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">cmdreason</span> <span class="o">=</span> <span class="s1">&#39;badant&#39;</span>
+<span class="n">inp</span> <span class="n">flagdata</span>
+<span class="n">go</span> <span class="n">flagdata</span>
+</pre></div>
+</div>
+<p>It is a good idea to review the inputs to the task using (<code class="docutils literal notranslate"><span class="pre">inp</span> <span class="pre">flagdata</span></code>) before running it.</p>
+<p>Radio Frequency Interferences (RFI) are the manmade radio band signals that enter the data and are unwanted. Signals such as
+those produced by satellites, aircraft communications are confined to narrow bands in the frequency and will appear as
+frequency channels that have very high amplitudes. It is not easy to remove the RFI from such channels and recover our astronomical
+signal. Thus we will flag the affected channels (may be individual or groups of channels). There are many ways to flag RFI - could be done manually after inspecting the spectra or using automated flaggers that look for outliers.</p>
+<p>At this stage this will be done on the time-frequency plane for each baseline using the mode <em>tfcrop</em> in the task <code class="docutils literal notranslate"><span class="pre">flagdata</span></code>.
+In the first step we get an idea about the amount of flagging that will result from our choice of parameters <code class="docutils literal notranslate"><span class="pre">action</span> <span class="pre">=</span> <span class="pre">'calculate</span></code>
+is the parameter that allows us to see this. Since we are still looking at uncalibrated data, we should be flagging only the
+worst RFI - the flagging percentage of a few percent is ok but if it shows high amount of flagging,
+one would like to increase the cutoffs used and check again. You may even decide to not use this automated flagger and examine the
+data further using plotms and locate the bad data and flag using <code class="docutils literal notranslate"><span class="pre">manual</span></code> mode in flagdata.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">flagdata</span><span class="p">)</span>
+<span class="n">inp</span> <span class="n">flagdata</span>
+<span class="n">vis</span> <span class="o">=</span> <span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;tfcrop&#39;</span>
+<span class="n">spw</span>  <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">ntime</span> <span class="o">=</span> <span class="s1">&#39;scan&#39;</span>
+<span class="n">timecutoff</span> <span class="o">=</span>  <span class="mf">6.0</span>
+<span class="n">freqcutoff</span> <span class="o">=</span> <span class="mf">6.0</span>
+<span class="n">extendflags</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">action</span> <span class="o">=</span> <span class="s1">&#39;calculate&#39;</span>
+<span class="n">display</span> <span class="o">=</span> <span class="s1">&#39;both&#39;</span>
+<span class="n">inp</span> <span class="n">flagdata</span>
+<span class="n">go</span> <span class="n">flagdata</span>
+</pre></div>
+</div>
+<p>If we are satisfied, we could run the same task with <code class="docutils literal notranslate"><span class="pre">action</span> <span class="pre">=</span> <span class="pre">'apply'</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">flagdata</span><span class="p">)</span>
+<span class="n">inp</span> <span class="n">flagdata</span>
+<span class="n">vis</span> <span class="o">=</span> <span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;tfcrop&#39;</span>
+<span class="n">spw</span>  <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">ntime</span> <span class="o">=</span> <span class="s1">&#39;scan&#39;</span>
+<span class="n">timecutoff</span> <span class="o">=</span>  <span class="mf">6.0</span>
+<span class="n">freqcutoff</span> <span class="o">=</span> <span class="mf">6.0</span>
+<span class="n">extendflags</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">action</span> <span class="o">=</span> <span class="s1">&#39;apply&#39;</span>
+<span class="n">display</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">inp</span> <span class="n">flagdata</span>
+<span class="n">go</span> <span class="n">flagdata</span>
+</pre></div>
+</div>
+<figure class="align-center">
+<a class="reference internal image-reference" href="_images/plotmsafterantfcropflags.png"><img alt="Plotms screenshot after flagging" src="_images/plotmsafterantfcropflags.png" style="width: 751.8px; height: 413.7px;" />
+</a>
+</figure>
+<div class="admonition-note admonition">
+<p class="admonition-title">Note</p>
+<p>If you happen to wrongly flag and would like to restore the older flags, use the task <code class="docutils literal notranslate"><span class="pre">flagmanager</span></code> with mode = ‘list’ to see the flagbackup versions. Locate the version to which you want to restore and run flagmanager with mode =’restore’ providing the versionname. After that use the task <code class="docutils literal notranslate"><span class="pre">flagmanager</span></code> again with the to delete the unwanted flagbackup versions using it with mode =’delete’ and giving the unwanted versionnames.</p>
+</div>
+<p>Now we extend the flags (growtime 80 means if more than 80% is flagged then fully flag, change if required)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">flagdata</span><span class="p">)</span>
+<span class="n">vis</span> <span class="o">=</span> <span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;extend&#39;</span>
+<span class="n">growtime</span><span class="o">=</span><span class="mf">80.0</span>
+<span class="n">growfreq</span><span class="o">=</span><span class="mf">80.0</span>
+<span class="n">action</span><span class="o">=</span><span class="s1">&#39;apply&#39;</span>
+<span class="n">inp</span> <span class="n">flagdata</span>
+<span class="n">go</span> <span class="n">flagdata</span>
+</pre></div>
+</div>
+</section>
+<section id="absolute-flux-density-calibration">
+<h2>Absolute flux density calibration<a class="headerlink" href="#absolute-flux-density-calibration" title="Permalink to this heading">¶</a></h2>
+<p>In this step, flux densities are set for the standard flux calibrator in the data. The standard flux calibrators used at the GMRT are 3C286, 3C48 and 3C147. We can chose the flux density standard in this task. The default choice is Perlay-Butler 2017.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">setjy</span><span class="p">)</span>
+<span class="n">vis</span> <span class="o">=</span> <span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">field</span> <span class="o">=</span> <span class="s1">&#39;3C147&#39;</span>
+<span class="n">go</span> <span class="n">setjy</span>
+</pre></div>
+</div>
+<figure class="align-center">
+<a class="reference internal image-reference" href="_images/setjylog.png"><img alt="Screenshot of the log after setjy" src="_images/setjylog.png" style="width: 1368.8000000000002px; height: 225.60000000000002px;" />
+</a>
+</figure>
+<p>If more than one flux calibrators are present, run it for each of the sources.</p>
+</section>
+<section id="delay-and-bandpass-calibration">
+<h2>Delay and bandpass calibration<a class="headerlink" href="#delay-and-bandpass-calibration" title="Permalink to this heading">¶</a></h2>
+<p>First we will do delay calibration. In calibration, a reference antenna is required. Here “C00” is only taken as an example. You may use any antenna that is working for the whole duration of the observation. We will henceforth be using a central portion of the bandwidth. Depending on
+the shape of the band, you may change this selection.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">gaincal</span><span class="p">)</span>
+<span class="n">vis</span> <span class="o">=</span> <span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">caltable</span> <span class="o">=</span> <span class="s1">&#39;multi.K1&#39;</span>
+<span class="n">field</span> <span class="o">=</span><span class="s1">&#39;3C286&#39;</span>
+<span class="n">spw</span> <span class="o">=</span> <span class="s1">&#39;0:51~1950&#39;</span>
+<span class="n">solint</span> <span class="o">=</span> <span class="s1">&#39;60s&#39;</span>
+<span class="n">refant</span> <span class="o">=</span> <span class="s1">&#39;C00&#39;</span>
+<span class="n">solnorm</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">gaintype</span> <span class="o">=</span> <span class="s1">&#39;K&#39;</span>
+<span class="n">inp</span> <span class="n">gaincal</span>
+<span class="n">go</span> <span class="n">gaincal</span>
+</pre></div>
+</div>
+<p>An initial gain calibration will be done.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">gaincal</span><span class="p">)</span>
+<span class="n">vis</span> <span class="o">=</span> <span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">caltable</span> <span class="o">=</span> <span class="s1">&#39;multi.G0&#39;</span>
+<span class="n">field</span> <span class="o">=</span><span class="s1">&#39;3C286&#39;</span>
+<span class="n">spw</span> <span class="o">=</span> <span class="s1">&#39;0:51~1950&#39;</span>
+<span class="n">solint</span> <span class="o">=</span> <span class="s1">&#39;int&#39;</span>
+<span class="n">refant</span> <span class="o">=</span> <span class="s1">&#39;C00&#39;</span>
+<span class="n">minsnr</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="n">gaintype</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
+<span class="n">gaintable</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;multi.K1&#39;</span><span class="p">]</span>
+<span class="n">inp</span> <span class="n">gaincal</span>
+<span class="n">go</span> <span class="n">gaincal</span>
+</pre></div>
+</div>
+<p>Bandpass calibration using the flux calibrator.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">bandpass</span><span class="p">)</span>
+<span class="n">vis</span> <span class="o">=</span> <span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">caltable</span> <span class="o">=</span> <span class="s1">&#39;multi.B1&#39;</span>
+<span class="n">field</span> <span class="o">=</span><span class="s1">&#39;3C286&#39;</span>
+<span class="n">spw</span> <span class="o">=</span> <span class="s1">&#39;0:51~1950&#39;</span>
+<span class="n">solint</span> <span class="o">=</span> <span class="s1">&#39;inf&#39;</span>
+<span class="n">refant</span> <span class="o">=</span> <span class="s1">&#39;C00&#39;</span>
+<span class="n">minsnr</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="n">solnorm</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">gaintable</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;multi.K1&#39;</span><span class="p">,</span><span class="s1">&#39;multi.G0&#39;</span><span class="p">]</span>
+<span class="n">inp</span> <span class="n">bandpass</span>
+<span class="n">go</span> <span class="n">bandpass</span>
+</pre></div>
+</div>
+<p>Examine the bandpass table using plotms. Choose the bandpass table multi.B1 in data and check the plots Amp Vs Channels and Phase Vs Channels
+iterated over antennas.</p>
+<p>Note the shape of the band across the frequencies.</p>
+</section>
+<section id="gain-calibration">
+<h2>Gain calibration<a class="headerlink" href="#gain-calibration" title="Permalink to this heading">¶</a></h2>
+<p>A final gain calibration will be done in this step. The task <code class="docutils literal notranslate"><span class="pre">gaincal</span></code> will be run on the calibrators (flux calibrator/s, and gain calibrator/s).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">gaincal</span><span class="p">)</span>
+<span class="n">vis</span> <span class="o">=</span> <span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">caltable</span> <span class="o">=</span> <span class="s1">&#39;multi.AP.G1&#39;</span>
+<span class="n">field</span> <span class="o">=</span><span class="s1">&#39;3C286&#39;</span>
+<span class="n">spw</span> <span class="o">=</span> <span class="s1">&#39;0:51~1950&#39;</span>
+<span class="n">solint</span> <span class="o">=</span> <span class="s1">&#39;120s&#39;</span>
+<span class="n">refant</span> <span class="o">=</span> <span class="s1">&#39;C00&#39;</span>
+<span class="n">minsnr</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="n">gaintype</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
+<span class="n">gaintable</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;multi.K1&#39;</span><span class="p">,</span> <span class="s1">&#39;multi.B1&#39;</span><span class="p">]</span>
+<span class="n">interp</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;nearest,nearestflag&#39;</span><span class="p">,</span> <span class="s1">&#39;nearest,nearestflag&#39;</span><span class="p">]</span>\
+<span class="n">inp</span> <span class="n">gaincal</span>
+<span class="n">go</span> <span class="n">gaincal</span>
+
+<span class="n">default</span><span class="p">(</span><span class="n">gaincal</span><span class="p">)</span>
+<span class="n">vis</span> <span class="o">=</span> <span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">caltable</span> <span class="o">=</span> <span class="s1">&#39;multi.AP.G1&#39;</span>
+<span class="n">field</span> <span class="o">=</span><span class="s1">&#39;1248-199&#39;</span>
+<span class="n">spw</span> <span class="o">=</span> <span class="s1">&#39;0:51~1950&#39;</span>
+<span class="n">solint</span> <span class="o">=</span> <span class="s1">&#39;120s&#39;</span>
+<span class="n">refant</span> <span class="o">=</span> <span class="s1">&#39;C00&#39;</span>
+<span class="n">minsnr</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="n">gaintype</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
+<span class="n">gaintable</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;multi.K1&#39;</span><span class="p">,</span> <span class="s1">&#39;multi.B1&#39;</span><span class="p">]</span>
+<span class="n">interp</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;nearest,nearestflag&#39;</span><span class="p">,</span> <span class="s1">&#39;nearest,nearestflag&#39;</span><span class="p">]</span>
+<span class="n">append</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">inp</span> <span class="n">gaincal</span>
+<span class="n">go</span> <span class="n">gaincal</span>
+</pre></div>
+</div>
+<p>The flux density of the phase calibrator will be set in the following step.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">fluxscale</span><span class="p">)</span>
+<span class="n">inp</span> <span class="n">fluxscale</span>
+<span class="n">vis</span> <span class="o">=</span> <span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">caltable</span> <span class="o">=</span> <span class="s1">&#39;multi.AP.G1&#39;</span>
+<span class="n">fluxtable</span> <span class="o">=</span> <span class="s1">&#39;multi.fluxscale&#39;</span>
+<span class="n">reference</span> <span class="o">=</span> <span class="s1">&#39;3C286&#39;</span>
+<span class="n">transfer</span> <span class="o">=</span> <span class="s1">&#39;1248-199&#39;</span>
+<span class="n">inp</span> <span class="n">fluxscale</span>
+<span class="n">go</span> <span class="n">fluxscale</span>
+</pre></div>
+</div>
+<figure class="align-center">
+<a class="reference internal image-reference" href="_images/fluxscalelog.png"><img alt="Screenshot of the log after fluxscale" src="_images/fluxscalelog.png" style="width: 1005.9px; height: 167.29999999999998px;" />
+</a>
+</figure>
+</section>
+<section id="transfer-of-gain-calibration-to-the-target">
+<h2>Transfer of gain calibration to the target<a class="headerlink" href="#transfer-of-gain-calibration-to-the-target" title="Permalink to this heading">¶</a></h2>
+<p>First we apply the calibration to the amplitude and phase calibrators. This task creates the <em>corrected</em> data column in the MS file.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">applycal</span><span class="p">)</span>
+<span class="n">inp</span> <span class="n">applycal</span>
+<span class="n">vis</span><span class="o">=</span><span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">field</span><span class="o">=</span><span class="s1">&#39;3C286&#39;</span>
+<span class="n">spw</span> <span class="o">=</span><span class="s1">&#39;0:51~1950&#39;</span>
+<span class="n">gaintable</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;multi.fluxscale&#39;</span><span class="p">,</span> <span class="s1">&#39;multi.K1&#39;</span><span class="p">,</span> <span class="s1">&#39;multi.B1&#39;</span><span class="p">]</span>
+<span class="n">gainfield</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;3C286&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
+<span class="n">interp</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
+<span class="n">calwt</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span>
+<span class="n">inp</span> <span class="n">applycal</span>
+<span class="n">go</span> <span class="n">applycal</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">applycal</span><span class="p">)</span>
+<span class="n">inp</span> <span class="n">applycal</span>
+<span class="n">vis</span><span class="o">=</span><span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">field</span><span class="o">=</span><span class="s1">&#39;1248-199&#39;</span>
+<span class="n">spw</span> <span class="o">=</span><span class="s1">&#39;0:51~1950&#39;</span>
+<span class="n">gaintable</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;multi.fluxscale&#39;</span><span class="p">,</span> <span class="s1">&#39;multi.K1&#39;</span><span class="p">,</span> <span class="s1">&#39;multi.B1&#39;</span><span class="p">]</span>
+<span class="n">gainfield</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;1248-199&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
+<span class="n">interp</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
+<span class="n">calwt</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span>
+<span class="n">inp</span> <span class="n">applycal</span>
+<span class="n">go</span> <span class="n">applycal</span>
+</pre></div>
+</div>
+<p>Apply calibration to the target.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">applycal</span><span class="p">)</span>
+<span class="n">inp</span> <span class="n">applycal</span>
+<span class="n">vis</span><span class="o">=</span><span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">field</span><span class="o">=</span><span class="s1">&#39;SGRB&#39;</span>
+<span class="n">spw</span> <span class="o">=</span><span class="s1">&#39;0:51~1950&#39;</span>
+<span class="n">gaintable</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;multi.fluxscale&#39;</span><span class="p">,</span> <span class="s1">&#39;multi.K1&#39;</span><span class="p">,</span> <span class="s1">&#39;multi.B1&#39;</span><span class="p">]</span>
+<span class="n">gainfield</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;1248-199&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
+<span class="n">interp</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
+<span class="n">calwt</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span>
+<span class="n">inp</span> <span class="n">applycal</span>
+<span class="n">go</span> <span class="n">applycal</span>
+</pre></div>
+</div>
+<p>Use the task <code class="docutils literal notranslate"><span class="pre">plotms</span></code> to examine the calibrated data. You need to select <em>corrected</em> data column for plotting.</p>
+<figure class="align-center" id="id4">
+<a class="reference internal image-reference" href="_images/fluxcalaftercal.png"><img alt="Screenshot of the plotms Amp Vs UVwave after calibration for the flux calibrator" src="_images/fluxcalaftercal.png" style="width: 857.6px; height: 469.6px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>The calibrated Amp Vs UVwave for the flux calibrator.</em></span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id5">
+<a class="reference internal image-reference" href="_images/phasecalaftercal.png"><img alt="Screenshot of the plotms Amp Vs UVwave after calibration for the phase calibrator" src="_images/phasecalaftercal.png" style="width: 853.6px; height: 472.0px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>The calibrated Amp Vs UVwave for the calibrator 1248-199.</em></span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>You will notice that there are some baselines showing higher amplitudes than the majority or some showing a large scatter.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">plotms</span></code> to locate which antennas and baselines have the outlier data.
+Use the task <code class="docutils literal notranslate"><span class="pre">flagdata</span></code> to flag those data.</p>
+</section>
+<section id="splitting-the-calibrated-target-source-data">
+<h2>Splitting the calibrated target source data<a class="headerlink" href="#splitting-the-calibrated-target-source-data" title="Permalink to this heading">¶</a></h2>
+<p>We will split the calibrated target source data to a new file and do the subsequent analysis on that file.
+Here we have chosen to drop some more of the edge channels.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">mstransform</span><span class="p">)</span>
+<span class="n">inp</span> <span class="n">mstransform</span>
+<span class="n">vis</span><span class="o">=</span><span class="s1">&#39;multi.ms&#39;</span>
+<span class="n">outputvis</span> <span class="o">=</span> <span class="s1">&#39;SGRB-split.ms&#39;</span>
+<span class="n">field</span><span class="o">=</span><span class="s1">&#39;SGRB&#39;</span>
+<span class="n">spw</span><span class="o">=</span><span class="s1">&#39;0:201~1800&#39;</span>
+<span class="n">datacolumn</span><span class="o">=</span><span class="s1">&#39;corrected&#39;</span>
+<span class="n">inp</span> <span class="n">mstransform</span>
+<span class="n">go</span> <span class="n">mstransform</span>
+</pre></div>
+</div>
+</section>
+<section id="flagging-on-calibrated-data">
+<h2>Flagging on calibrated data<a class="headerlink" href="#flagging-on-calibrated-data" title="Permalink to this heading">¶</a></h2>
+<p>In this section flagging is done on calibrated target source data.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">flagdata</span><span class="p">)</span>
+<span class="n">inp</span> <span class="n">flagdata</span>
+<span class="n">vis</span> <span class="o">=</span> <span class="s1">&#39;SGRB-split.ms&#39;</span>
+<span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;tfcrop&#39;</span>
+<span class="n">timecutoff</span> <span class="o">=</span> <span class="mf">5.0</span>
+<span class="n">freqcutoff</span> <span class="o">=</span> <span class="mf">5.0</span>
+<span class="n">timefit</span> <span class="o">=</span> <span class="s1">&#39;poly&#39;</span>
+<span class="n">freqfit</span> <span class="o">=</span> <span class="s1">&#39;line&#39;</span>
+<span class="n">extendflags</span><span class="o">=</span><span class="kc">False</span>
+<span class="n">inp</span> <span class="n">flagdata</span>
+<span class="n">go</span> <span class="n">flagdata</span>
+</pre></div>
+</div>
+<p>You may try out using window statistics and vary ntime to attain better flagging. Though always be careful about not overdoing the flags.</p>
+<p>The mode <code class="docutils literal notranslate"><span class="pre">rflag</span></code> needs to be used with more caution. It is better to select uvranges where you expect the amplitudes to be comparable.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">flagdata</span><span class="p">)</span>
+<span class="n">inp</span> <span class="n">flagdata</span>
+<span class="n">vis</span><span class="o">=</span><span class="s1">&#39;SGRB-split.ms&#39;</span>
+<span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rflag&quot;</span>
+<span class="n">uvrange</span> <span class="o">=</span> <span class="s1">&#39;&gt;3klamda&#39;</span>
+<span class="n">timedevscale</span><span class="o">=</span><span class="mf">5.0</span>
+<span class="n">freqdevscale</span><span class="o">=</span><span class="mf">5.0</span>
+<span class="n">spectralmax</span><span class="o">=</span><span class="mf">500.0</span>
+<span class="n">extendflags</span><span class="o">=</span><span class="kc">False</span>
+<span class="n">inp</span> <span class="n">flagdata</span>
+<span class="n">go</span> <span class="n">flagdata</span>
+</pre></div>
+</div>
+<p>Examine the data using <code class="docutils literal notranslate"><span class="pre">plotms</span></code>. Flag individual baselines as may be needed.</p>
+</section>
+<section id="averaging-in-frequency">
+<h2>Averaging in frequency<a class="headerlink" href="#averaging-in-frequency" title="Permalink to this heading">¶</a></h2>
+<p>The data are averaged in frequency to reduce the volume of the data. However the averaging is done only such that one is not affected by <em>bandwidth smearing</em>. For Band 4 it is recommended to average up to 10 channels (when BW is 200 MHz over 2048 channels). However in order to keep the computation time reasonable, for this tutorial we will average 20 channels. You can check the effect of this on the shapes of the
+sources at the edge of the field.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">mstransform</span><span class="p">)</span>
+<span class="n">inp</span> <span class="n">mstransform</span>
+<span class="n">vis</span><span class="o">=</span><span class="s1">&#39;SGRB-split.ms&#39;</span>
+<span class="n">outputvis</span><span class="o">=</span><span class="s1">&#39;SGRB-avg-split.ms&#39;</span>
+<span class="n">chanaverage</span><span class="o">=</span><span class="kc">True</span>
+<span class="n">chanbin</span><span class="o">=</span><span class="mi">20</span>
+<span class="n">inp</span> <span class="n">mstransform</span>
+<span class="n">go</span> <span class="n">mstransform</span>
+</pre></div>
+</div>
+<p>Some more flagging will be done on the data at this stage to get the final dataset for imaging.
+Use <code class="docutils literal notranslate"><span class="pre">plotms</span></code> to decide on where and what you would like to flag and proceed accordingly.</p>
+</section>
+<section id="imaging">
+<h2>Imaging<a class="headerlink" href="#imaging" title="Permalink to this heading">¶</a></h2>
+<p>We will use the task <code class="docutils literal notranslate"><span class="pre">tclean</span></code> for imaging. Go through the CASA documentation for tclean to understand the meaning of the various parameters.
+To save on computation, in this example we have set wprojplanes=128. In general to account for the w-term more accurately set wprojplanes= -1 so that it will be calculated internally in CASA. In this example we have used <em>interactive = False</em> in tclean.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">tclean</span><span class="p">)</span>
+<span class="n">inp</span> <span class="n">tclean</span>
+<span class="n">vis</span><span class="o">=</span><span class="s1">&#39;SGRB-avg-split.ms&#39;</span>
+<span class="n">imagename</span><span class="o">=</span><span class="s1">&#39;SGRB-img&#39;</span>
+<span class="n">imsize</span><span class="o">=</span><span class="mi">7200</span>
+<span class="n">cell</span><span class="o">=</span><span class="s1">&#39;1.0arcsec&#39;</span>
+<span class="n">specmode</span><span class="o">=</span><span class="s1">&#39;mfs&#39;</span>
+<span class="n">gridder</span><span class="o">=</span><span class="s1">&#39;wproject&#39;</span>
+<span class="n">wprojplanes</span><span class="o">=</span><span class="mi">128</span>
+<span class="n">pblimit</span><span class="o">=-</span><span class="mf">0.0001</span>
+<span class="n">deconvolver</span><span class="o">=</span><span class="s1">&#39;mtmfs&#39;</span>
+<span class="n">nterms</span><span class="o">=</span><span class="mi">2</span>
+<span class="n">weighting</span><span class="o">=</span><span class="s1">&#39;briggs&#39;</span>
+<span class="n">robust</span><span class="o">=</span><span class="mi">0</span>
+<span class="n">niter</span><span class="o">=</span><span class="mi">2000</span>
+<span class="n">threshold</span><span class="o">=</span><span class="s1">&#39;0.01mJy&#39;</span>
+<span class="n">cyclefactor</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">interactive</span><span class="o">=</span><span class="kc">False</span>
+<span class="n">usemask</span><span class="o">=</span><span class="s1">&#39;auto-multithresh&#39;</span>
+<span class="n">sidelobethreshold</span><span class="o">=</span><span class="mf">2.0</span>
+<span class="n">pbmask</span><span class="o">=</span><span class="mf">0.0</span>
+<span class="n">savemodel</span><span class="o">=</span><span class="s1">&#39;modelcolumn&#39;</span>
+<span class="n">inp</span> <span class="n">tclean</span>
+<span class="n">go</span> <span class="n">tclean</span>
+</pre></div>
+</div>
+<p>Keep an eye on the logger messages to get an idea about the processing and in particular see the total flux cleaned.
+Once the task ends successfully, you can view the image using <code class="docutils literal notranslate"><span class="pre">imview</span></code>.
+The main image you would like to see is the one with the extension <em>image.tt0</em>.
+Adjust the data range to display it in a reasonable colour scale to show the peaks as well as the noise in the image.
+Also inspect the rest of the images created by tclean - the .psf, .mask, .model, .residual.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">imview</span>
+</pre></div>
+</div>
+<figure class="align-center" id="id6">
+<a class="reference internal image-reference" href="_images/sgrb-image1.png"><img alt="The central part of the image produced by tclean. You can still see patterns around the sources due to the effect of the beam." src="_images/sgrb-image1.png" style="width: 604.0999999999999px; height: 548.0999999999999px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>A zoom-in on the central region of the first image.</em></span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="self-calibration">
+<h2>Self-calibration<a class="headerlink" href="#self-calibration" title="Permalink to this heading">¶</a></h2>
+<p>This is an iterative process. The model from the first tclean is used to calibrate the data and the corrected data are then imaged to make a better model and the process is repeated. The order of the tasks is tclean, gaincal, applycal, tclean. A reasonable choice is to do 5 phase only and two amplitude and phase self-calibrations. We start from a longer “solint” (solution interval), for e. g. “8min” and gradually lower it to “1min” during the phase only iterations. For “a&amp;p” self-calibration, again choose a longer solint such as “2min”. We keep solnorm=False in phase only iterations and solnorm=True in “a&amp;p” self-calibration. As the iterations advance, the model sky is expected to get better so in the task tclean, lower the threshold and increase niter.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">default</span><span class="p">(</span><span class="n">gaincal</span><span class="p">)</span>
+ <span class="n">vis</span> <span class="o">=</span><span class="s1">&#39;GRB-avg-split.ms&#39;</span>
+ <span class="n">caltable</span><span class="o">=</span><span class="s1">&#39;selcal-p1.GT&#39;</span>
+ <span class="n">solint</span> <span class="o">=</span> <span class="s1">&#39;8min&#39;</span>
+ <span class="n">refant</span> <span class="o">=</span><span class="s1">&#39;C00&#39;</span>
+ <span class="n">minsnr</span> <span class="o">=</span> <span class="mf">3.0</span>
+ <span class="n">gaintype</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
+ <span class="n">solnorm</span><span class="o">=</span> <span class="kc">False</span>
+ <span class="n">calmode</span> <span class="o">=</span><span class="s1">&#39;p&#39;</span>
+ <span class="n">go</span> <span class="n">gaincal</span>
+
+<span class="n">Using</span> <span class="n">the</span> <span class="n">task</span> <span class="s2">&quot;plotcal&quot;</span> <span class="n">you</span> <span class="n">can</span> <span class="n">examine</span> <span class="n">the</span> <span class="n">gain</span> <span class="n">table</span><span class="o">.</span> <span class="n">In</span> <span class="n">successive</span> <span class="n">iterations</span> <span class="n">of</span> <span class="bp">self</span><span class="o">-</span><span class="n">calibration</span><span class="p">,</span> <span class="n">you</span> <span class="n">should</span> <span class="n">find</span> <span class="n">that</span> <span class="n">the</span> <span class="n">phases</span> <span class="n">are</span> <span class="n">more</span> <span class="ow">and</span> <span class="n">more</span> <span class="n">tightly</span> <span class="n">scattered</span> <span class="n">around</span> <span class="n">zero</span><span class="o">.</span> <span class="n">If</span> <span class="n">this</span> <span class="n">trend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">there</span><span class="p">,</span> <span class="n">you</span> <span class="n">can</span> <span class="n">suspect</span> <span class="n">that</span> <span class="n">the</span> <span class="bp">self</span><span class="o">-</span><span class="n">calibration</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">going</span> <span class="n">well</span> <span class="o">-</span> <span class="n">check</span> <span class="n">the</span> <span class="n">previous</span> <span class="n">tclean</span> <span class="n">runs</span> <span class="n">to</span> <span class="n">see</span> <span class="k">if</span> <span class="n">the</span> <span class="n">total</span> <span class="n">cleaned</span> <span class="n">flux</span> <span class="n">was</span> <span class="n">increasing</span><span class="o">.</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">applycal</span><span class="p">)</span>
+<span class="n">vis</span><span class="o">=</span><span class="s1">&#39;SGRB-avg-split.ms&#39;</span>
+<span class="n">gaintable</span><span class="o">=</span><span class="s1">&#39;selcal-p1.GT&#39;</span>
+<span class="n">applymode</span><span class="o">=</span><span class="s1">&#39;calflag&#39;</span>
+<span class="n">interp</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;linear&#39;</span><span class="p">]</span>
+<span class="n">go</span> <span class="n">applycal</span>
+</pre></div>
+</div>
+<p>We will split the corrected data to a new file and use it for imaging. This is just for better book-keeping. You may choose to do the successive self-calibration iterations on the same MS file but remember that the corrected data and model data columns will be overwritten by applycal and tclean.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">mstransform</span><span class="p">)</span>
+<span class="n">vis</span><span class="o">=</span><span class="s1">&#39;SGRB-avg-split.ms&#39;</span>
+<span class="n">datacolumn</span><span class="o">=</span><span class="s1">&#39;corrected&#39;</span>
+<span class="n">outputvis</span><span class="o">=</span><span class="s1">&#39;vis-selfcal-p1.ms&#39;</span>
+<span class="n">go</span> <span class="n">mstransform</span>
+</pre></div>
+</div>
+<p>In the next iteration we will use a larger niter and lower the threshold. In the tclean messages do check the total cleaned flux and the number of iterations needed to reach that.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">default</span><span class="p">(</span><span class="n">tclean</span><span class="p">)</span>
+<span class="n">imagename</span><span class="o">=</span><span class="s1">&#39;SGRB-img1&#39;</span>
+<span class="n">imsize</span><span class="o">=</span><span class="mi">7200</span>
+<span class="n">cell</span><span class="o">=</span><span class="s1">&#39;1.0arcsec&#39;</span>
+<span class="n">specmode</span><span class="o">=</span><span class="s1">&#39;mfs&#39;</span>
+<span class="n">gridder</span><span class="o">=</span><span class="s1">&#39;wproject&#39;</span>
+<span class="n">wprojplanes</span><span class="o">=</span><span class="mi">128</span>
+<span class="n">pblimit</span><span class="o">=-</span><span class="mf">0.0001</span>
+<span class="n">deconvolver</span><span class="o">=</span><span class="s1">&#39;mtmfs&#39;</span>
+<span class="n">nterms</span><span class="o">=</span><span class="mi">2</span>
+<span class="n">weighting</span><span class="o">=</span><span class="s1">&#39;briggs&#39;</span>
+<span class="n">robust</span><span class="o">=</span><span class="mi">0</span>
+<span class="n">niter</span><span class="o">=</span><span class="mi">4000</span>
+<span class="n">threshold</span><span class="o">=</span><span class="s1">&#39;0.01mJy&#39;</span>
+<span class="n">cyclefactor</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">interactive</span><span class="o">=</span><span class="kc">False</span>
+<span class="n">usemask</span><span class="o">=</span><span class="s1">&#39;auto-multithresh&#39;</span>
+<span class="n">sidelobethreshold</span><span class="o">=</span><span class="mf">2.0</span>
+<span class="n">pbmask</span><span class="o">=</span><span class="mf">0.0</span>
+<span class="n">savemodel</span><span class="o">=</span><span class="s1">&#39;modelcolumn&#39;</span>
+<span class="n">inp</span> <span class="n">tclean</span>
+<span class="n">go</span> <span class="n">tclean</span>
+</pre></div>
+</div>
+<p>Repeat until you stop seeing improvement in the image sensitivity.</p>
+<figure class="align-center" id="id7">
+<a class="reference internal image-reference" href="_images/sgrb-image-selfcal.png"><img alt="The central part of the image produced by tclean after self-calibration." src="_images/sgrb-image-selfcal.png" style="width: 593.5999999999999px; height: 546.6999999999999px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><em>A zoom-in on the central region of the image after self-calibration.</em></span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>After you get your final image you need to do a primary beam correction. The task “widebandpbcor” in CASA does not have the information of the GMRT primary beam shape. A modified version of this task called <a class="reference external" href="https://github.com/ruta-k/uGMRTprimarybeam-CASA6">ugmrtpb</a> has been written for the uGMRT primary beam correction. You can follow the instructions there to do a primary beam correction for your image.</p>
+<p>For this tutorial on the RAS machines please see the steps <a class="reference external" href="http://www.ncra.tifr.res.in/~ruta/files/ugmrtpb_install.txt">here</a>.</p>
+<p>Acknowledgements: We thank Ishwara Chandra who provided the data used in the Radio Astronomy School for the CASA tutorial. We also thank Nissim Kanekar and Ruta Kale who helped make the first version of this tutorial. The original tutorial has been converted to html by Ruta Kale with help from Shilkumar Meshram.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">gmrt-tutorial</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="beforeyoubegin.html">Prerequisites</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Continuum data reduction using CASA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-inspection">Data inspection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#flagging">Flagging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#absolute-flux-density-calibration">Absolute flux density calibration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#delay-and-bandpass-calibration">Delay and bandpass calibration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gain-calibration">Gain calibration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#transfer-of-gain-calibration-to-the-target">Transfer of gain calibration to the target</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#splitting-the-calibrated-target-source-data">Splitting the calibrated target source data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#flagging-on-calibrated-data">Flagging on calibrated data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#averaging-in-frequency">Averaging in frequency</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#imaging">Imaging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#self-calibration">Self-calibration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="HIabsv0.html">Spectral line  data reduction using CASA (source 1543+480)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pulsar.html">Pulsar data analysis</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="beforeyoubegin.html" title="previous chapter">Prerequisites</a></li>
+      <li>Next: <a href="HIabsv0.html" title="next chapter">Spectral line  data reduction using CASA (source 1543+480)</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Ruta.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/continuumband4.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

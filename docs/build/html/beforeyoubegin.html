@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Prerequisites &#8212; gmrt-tutorial q documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Continuum data reduction using CASA" href="continuumband4.html" />
+    <link rel="prev" title="Welcome to GMRT tutorials !" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="prerequisites">
+<h1>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this heading">¶</a></h1>
+<section id="interferometric-data">
+<h2>Interferometric data<a class="headerlink" href="#interferometric-data" title="Permalink to this heading">¶</a></h2>
+<p>The interferometric (continuum/spectral line) data from GMRT can be analysed using NRAO’s
+Common Astronomy Software Applications (<a class="reference external" href="https://casadocs.readthedocs.io/en/stable/">CASA</a>) or Astronomical Image Processing System (<a class="reference external" href="http://www.aips.nrao.edu/index.shtml">AIPS</a>).
+We will focus on the analysis using CASA in these tutorials.</p>
+<section id="casa">
+<h3>CASA<a class="headerlink" href="#casa" title="Permalink to this heading">¶</a></h3>
+<p>You need to download and install CASA. It is important to read the CASA <a class="reference external" href="https://casadocs.readthedocs.io/en/stable/api/casatasks.html">documentation</a> in order to understand the details of the CASA tasks and the overall functioning of CASA. It will be useful to get familiar with the <a class="reference external" href="https://casadocs.readthedocs.io/en/stable/notebooks/usingcasa.html">usage</a> at the ipython prompt before
+starting the tutorials. The specific CASA version in which the tutorial was prepared is provided at the beginning
+of the individual tutorials.</p>
+</section>
+</section>
+<section id="pulsar-beam-data">
+<h2>Pulsar/Beam data<a class="headerlink" href="#pulsar-beam-data" title="Permalink to this heading">¶</a></h2>
+<p>The pulsar/beam data are typically recorded using the phased-array (PA) and the
+incoherent-array (IA) observing modes of the GMRT. The format of the native beam
+data is same for both the PA and the IA observing modes. After a simple format
+conversion using <a class="reference external" href="https://github.com/SixByNine/sigproc.git">SIGPROC</a>/<a class="reference external" href="https://github.com/ymaan4/RFIClean">RFIClean</a>, the native beam data from GMRT can be
+used with the publicly available softwares such as <a class="reference external" href="https://github.com/SixByNine/sigproc.git">SIGPROC</a>, <a class="reference external" href="https://github.com/scottransom/presto">PRESTO</a>, <a class="reference external" href="https://github.com/demorest/dspsr">DSPSR</a>,
+etc. The tutorial will use data already converted to the SIGPROC filterbank format.
+The primary softwares needed for the tutorial are <a class="reference external" href="https://github.com/scottransom/presto">PRESTO</a>, <a class="reference external" href="https://bitbucket.org/psrsoft/tempo2.git">tempo2</a>, and their
+dependencies.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">gmrt-tutorial</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Prerequisites</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#interferometric-data">Interferometric data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pulsar-beam-data">Pulsar/Beam data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="continuumband4.html">Continuum data reduction using CASA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="HIabsv0.html">Spectral line  data reduction using CASA (source 1543+480)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pulsar.html">Pulsar data analysis</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to GMRT tutorials !</a></li>
+      <li>Next: <a href="continuumband4.html" title="next chapter">Continuum data reduction using CASA</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Ruta.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/beforeyoubegin.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
