@@ -345,6 +345,7 @@ Note that since the source would be a point source, we have excluded the short b
 .. code-block::
 
    tget applycal
+   default
    inp
    vis='1543+480.ms'
    field='0,1'
@@ -429,6 +430,7 @@ The flux values assigned can be verified using the VLA calibrator manual, and th
    go
 
    tget applycal
+   default
    field='0,1'
    gaintable=['caltables/gainsol_1.apcal']
    go
@@ -494,6 +496,7 @@ The solutions are first applied to the flux calibrator field by applycal, and a 
 .. code-block::
 
    tget applycal
+   default
    inp
    vis='1543+480.ms'
    field='0'
@@ -609,6 +612,8 @@ The solutions are applied to all fields, including the target:
 .. code-block::
 
    tget applycal
+   default
+   vis='1543+480.ms'
    gaintable=['caltables/delay.kcal','caltables/bandpass_finalint.bcal','caltables/gainsol_int.fcal'] 
    field=''
    go
@@ -787,6 +792,7 @@ The phase-only cal is performed once the viewer GUI closes automatically after y
    go
    
    tget applycal 
+   default
    inp
    vis='source.ms'
    gaintable=['caltables/selfcal_0.pcal']
