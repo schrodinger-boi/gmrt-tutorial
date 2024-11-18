@@ -4,10 +4,5 @@ build:
   tools:
     python: "3.8"  # Specify the version of Python
 
-requirements:
-  - sphinx==4.0.0         # Specify the version of Sphinx you want
-  - sphinx-rtd-theme      # If you're using the Read the Docs theme
-  # Add other dependencies as needed (e.g., extensions for Sphinx)
-
 sphinx:
   configuration: docs/source/conf.py  # Path to your Sphinx conf.py file
