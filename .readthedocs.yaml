@@ -5,4 +5,5 @@ build:
     python: "3.8"
 sphinx:
   configuration: docs/source/conf.py
-requirements_file: requirements.txt  # Make sure this line is added
+requirements:
+  - requirements.txt  # Specify the requirements file here
