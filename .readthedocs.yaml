@@ -3,5 +3,12 @@ build:
   os: ubuntu-20.04  # Specify the operating system (e.g., ubuntu-20.04)
   tools:
     python: "3.8"  # Specify the version of Python
+  dependencies:
+    # You can include the dependencies your project needs here
+    - pip:
+        - sphinx==4.0.0         # Specify the version of Sphinx you want
+        - sphinx-rtd-theme      # If you're using the Read the Docs theme
+        # Add other dependencies as needed (e.g., extensions for Sphinx)
+
 sphinx:
   configuration: docs/source/conf.py  # Path to your Sphinx conf.py file
