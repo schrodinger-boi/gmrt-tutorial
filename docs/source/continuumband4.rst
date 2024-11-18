@@ -716,7 +716,9 @@ After you get your final image you need to do a primary beam correction. The tas
 For this tutorial on the RAS machines please see the steps `here`_. This step can not be performed in newer versions of the CASA as custom tasks can not be made by the users. So, either access a precompiled version of the task, which is always going to be messy. Better to use a new software, which has the sole purpose of correcting primary beams for uGMRT images. Finalflash (`finalflash`_) is developed by astronomers at NCRA and has the latest beam co-efficients are available.
 
 I assume you are on a python3 environment, do, pip3 install finalflash 
+
 Done, now just have to run finalflash <input_fits_image> <output_fits_image>
+
 In case, you do not have a fits image, do exportfits("your_image_name", fitsimage='fits_image.fits') inside the CASA console. 
 
 Acknowledgements: We thank Ishwara Chandra who provided the data used in the Radio Astronomy School for the CASA tutorial. We also thank Nissim Kanekar and Ruta Kale who helped make the first version of this tutorial. The original tutorial has been converted to html by Ruta Kale with help from Shilkumar Meshram. 
