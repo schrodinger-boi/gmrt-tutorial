@@ -713,7 +713,7 @@ Repeat until you stop seeing improvement in the image sensitivity.
 
 After you get your final image you need to do a primary beam correction. The task "widebandpbcor" in CASA does not have the information of the GMRT primary beam shape. A modified version of this task called `ugmrtpb`_ has been written for the uGMRT primary beam correction. You can follow the instructions there to do a primary beam correction for your image.
 
-For this tutorial on the RAS machines please see the steps `here`_. This step can not be performed in newer versions of the CASA as custom tasks can not be made by the users. So, either access a precompiled version of the task, which is always going to be messy. Better to use a new software, which has the sole purpose of correcting primary beams for uGMRT images. Finalflash (_finalflash) is developed by astronomers at NCRA and has the latest beam co-efficients are available.
+For this tutorial on the RAS machines please see the steps `here`_. This step can not be performed in newer versions of the CASA as custom tasks can not be made by the users. So, either access a precompiled version of the task, which is always going to be messy. Better to use a new software, which has the sole purpose of correcting primary beams for uGMRT images. Finalflash (`finalflash`_) is developed by astronomers at NCRA and has the latest beam co-efficients are available.
 
 I assume you are on a python3 environment, do, pip3 install finalflash 
 Done, now just have to run finalflash <input_fits_image> <output_fits_image>
